@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stillroom — Offline Standalone Prototype</title>
+  <style>
+    :root {
+      --blush: #F9E7EB;
+      --pale-sage: #DDEDE1;
+      --soft-sage: #BBD9C5;
+      --warm-white: #FFF9F7;
+      --forest: #294737;
+      --forest-hover: #1f382b;
+      --dark: #26342C;
+      --font-serif: "Newsreader", "Georgia", "Cambria", serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--warm-white);
+      color: var(--dark);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1, h2, h3, h4, .serif {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      color: var(--forest);
+    }
+
+    /* Container */
+    .container {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    /* Header Nav */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(255, 249, 247, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--pale-sage);
+      padding: 0.75rem 0;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+      background: none;
+    }
+
+    .brand-logo {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 50%;
+      background: var(--pale-sage);
+      border: 1px solid var(--soft-sage);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-weight: bold;
+      color: var(--forest);
+      font-size: 1.1rem;
+    }
+
+    .brand-title {
+      font-size: 1.35rem;
+      color: var(--forest);
+      line-height: 1.1;
+    }
+
+    .brand-tagline {
+      font-size: 0.7rem;
+      color: rgba(38, 52, 44, 0.7);
+    }
+
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(221, 237, 225, 0.5);
+      border: 1px solid var(--soft-sage);
+      padding: 0.25rem;
+      border-radius: 9999px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.825rem;
+      font-weight: 500;
+      border: none;
+      background: none;
+      color: var(--dark);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn.active {
+      background: var(--forest);
+      color: var(--warm-white);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .nav-btn:hover:not(.active) {
+      background: var(--pale-sage);
+      color: var(--forest);
+    }
+
+    .privacy-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: rgba(249, 231, 235, 0.7);
+      border: 1px solid var(--blush);
+      color: var(--forest);
+      cursor: pointer;
+    }
+
+    /* Badges & Pills */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: var(--pale-sage);
+      color: var(--forest);
+      border: 1px solid var(--soft-sage);
+    }
+
+    .badge-blush {
+      background: var(--blush);
+      color: var(--forest);
+      border: 1px solid #f4ccd6;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--warm-white);
+      border: 1px solid var(--pale-sage);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(41, 71, 55, 0.03);
+      transition: all 0.2s ease;
+    }
+
+    .card-interactive:hover {
+      border-color: var(--soft-sage);
+      box-shadow: 0 4px 14px rgba(41, 71, 55, 0.08);
+      cursor: pointer;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.55rem 1.25rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--forest);
+      color: var(--warm-white);
+    }
+    .btn-primary:hover {
+      background: var(--forest-hover);
+    }
+
+    .btn-secondary {
+      background: white;
+      border-color: var(--pale-sage);
+      color: var(--forest);
+    }
+    .btn-secondary:hover {
+      background: var(--pale-sage);
+    }
+
+    .btn-sage {
+      background: var(--pale-sage);
+      color: var(--forest);
+      border-color: var(--soft-sage);
+    }
+    .btn-sage:hover {
+      background: var(--soft-sage);
+    }
+
+    .btn-icon {
+      padding: 0.4rem;
+      border-radius: 0.6rem;
+      background: transparent;
+      border: none;
+      color: rgba(38, 52, 44, 0.6);
+      cursor: pointer;
+    }
+    .btn-icon:hover {
+      color: var(--forest);
+      background: var(--pale-sage);
+    }
+    .btn-icon.btn-danger:hover {
+      color: #991b1b;
+      background: var(--blush);
+    }
+
+    /* Forms */
+    input[type="text"], input[type="date"], textarea, select {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border-radius: 0.85rem;
+      border: 1px solid var(--pale-sage);
+      background: white;
+      font-family: var(--font-sans);
+      font-size: 0.825rem;
+      color: var(--dark);
+      outline: none;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--forest);
+      box-shadow: 0 0 0 2px rgba(41, 71, 55, 0.15);
+    }
+
+    /* Sliders */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 5px;
+      background: var(--pale-sage);
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--forest);
+      cursor: pointer;
+    }
+
+    /* Grid layouts */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--forest);
+      color: var(--warm-white);
+      padding: 0.65rem 1.25rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 100;
+      animation: fadeIn 0.2s ease;
+    }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(38, 52, 44, 0.45);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 90;
+    }
+    .modal-content {
+      background: var(--warm-white);
+      border-radius: 1.75rem;
+      border: 1px solid var(--pale-sage);
+      padding: 2rem;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .sub-tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Utility */
+    .hidden { display: none !important; }
+    .mt-4 { margin-top: 1rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .gap-2 { gap: 0.5rem; }
+    .flex-wrap { flex-wrap: wrap; }
+    .space-between { justify-content: space-between; }
+    .align-center { align-items: center; }
+    .flex { display: flex; }
+
+    /* SVG Artwork Container */
+    .tapestry-art-wrap {
+      aspect-ratio: 4/3;
+      width: 100%;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      border: 1px solid var(--pale-sage);
+      background: var(--warm-white);
+    }
+    .tapestry-art-wrap svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header>
+    <div class="container nav-inner">
+      <button class="brand" onclick="switchTab('dashboard')">
+        <div class="brand-logo">S</div>
+        <div style="text-align: left;">
+          <h1 class="brand-title">Stillroom</h1>
+          <p class="brand-tagline">You deserve to be heard.</p>
+        </div>
+      </button>
+
+      <div class="nav-tabs">
+        <button class="nav-btn active" id="tab-btn-dashboard" onclick="switchTab('dashboard')">
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-btn" id="tab-btn-reflect" onclick="switchTab('reflect')">
+          <span>Reflect</span>
+        </button>
+        <button class="nav-btn" id="tab-btn-community" onclick="switchTab('community')">
+          <span>Community</span>
+        </button>
+        <button class="nav-btn" id="tab-btn-sessions" onclick="switchTab('sessions')">
+          <span>Sessions</span>
+          <span class="badge" id="nav-session-count" style="margin-left: 2px;">1</span>
+        </button>
+      </div>
+
+      <button class="privacy-badge" onclick="openPrivacyModal()">
+        <span>🔒 100% Offline & Private</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container" style="padding-top: 2rem; padding-bottom: 4rem; flex: 1;">
+
+    <!-- ================= DASHBOARD VIEW ================= -->
+    <div id="view-dashboard">
+      <!-- Hero Banner -->
+      <div class="card" style="background: linear-gradient(135deg, rgba(221,237,225,0.7), var(--warm-white), rgba(249,231,235,0.7)); padding: 2.5rem; margin-bottom: 2rem;">
+        <span class="badge" style="margin-bottom: 0.75rem;">Stillroom Offline Prototype</span>
+        <h2 style="font-size: 2.4rem; margin-bottom: 0.5rem; line-height: 1.15;">You deserve to be heard.</h2>
+        <p style="max-width: 650px; font-size: 0.95rem; color: rgba(38,52,44,0.85); margin-bottom: 1.25rem;">
+          A quiet sanctuary to express what you are carrying, discover lived experiences that resonate with yours, and preserve therapeutic insights.
+        </p>
+        <div class="flex gap-2 flex-wrap">
+          <button class="btn btn-primary" onclick="switchTab('reflect', 'journal')">✍️ Write a Reflection</button>
+          <button class="btn btn-secondary" onclick="switchTab('sessions')">🗓️ Record Session (<span id="hero-session-count">1</span>)</button>
+          <button class="btn btn-sage" onclick="switchTab('community')">👥 Browse Community</button>
+        </div>
+      </div>
+
+      <!-- 3 Pillars -->
+      <h3 style="font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">Core Sanctuaries</h3>
+      <div class="grid-3" style="margin-bottom: 2rem;">
+        <div class="card card-interactive" onclick="switchTab('reflect')">
+          <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">📖</div>
+          <h3>Reflect</h3>
+          <p style="font-size: 0.85rem; color: rgba(38,52,44,0.75); margin-top: 0.25rem;">
+            Journal your unexpressed thoughts privately or craft an abstract colour tapestry mirroring your emotional climate.
+          </p>
+          <div style="margin-top: 1rem; font-size: 0.78rem; font-weight: 600; color: var(--forest);">
+            <span id="dash-ref-count">2</span> reflections · <span id="dash-tap-count">1</span> tapestries &rarr;
+          </div>
+        </div>
+
+        <div class="card card-interactive" onclick="switchTab('community')">
+          <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🕊️</div>
+          <h3>Community</h3>
+          <p style="font-size: 0.85rem; color: rgba(38,52,44,0.75); margin-top: 0.25rem;">
+            Explore anonymized peer stories navigating loneliness, family boundaries, academic anxiety, and personal healing.
+          </p>
+          <div style="margin-top: 1rem; font-size: 0.78rem; font-weight: 600; color: var(--forest);">
+            6 curated stories &rarr;
+          </div>
+        </div>
+
+        <div class="card card-interactive" onclick="switchTab('sessions')">
+          <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🌱</div>
+          <h3>Sessions</h3>
+          <p style="font-size: 0.85rem; color: rgba(38,52,44,0.75); margin-top: 0.25rem;">
+            Log therapy takeaways, maintain a personal chronology, and export your session insights as Markdown or plain text.
+          </p>
+          <div style="margin-top: 1rem; font-size: 0.78rem; font-weight: 600; color: var(--forest);">
+            <span id="dash-sess-count">1</span> recorded sessions &rarr;
+          </div>
+        </div>
+      </div>
+
+      <!-- Overview Previews -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="flex space-between align-center mb-4">
+            <h3>Recent Private Reflections</h3>
+            <button class="btn btn-secondary" style="padding: 0.3rem 0.75rem; font-size: 0.75rem;" onclick="switchTab('reflect', 'journal')">View all</button>
+          </div>
+          <div id="dash-recent-reflections" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+        </div>
+
+        <div class="card">
+          <div class="flex space-between align-center mb-4">
+            <h3>Featured Community Voice</h3>
+            <button class="btn btn-secondary" style="padding: 0.3rem 0.75rem; font-size: 0.75rem;" onclick="switchTab('community')">Read feed</button>
+          </div>
+          <div id="dash-featured-story"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= REFLECT VIEW ================= -->
+    <div id="view-reflect" class="hidden">
+      <div class="sub-tabs">
+        <div class="nav-tabs">
+          <button class="nav-btn active" id="subtab-btn-journal" onclick="switchReflectSubTab('journal')">✍️ Private Reflections</button>
+          <button class="nav-btn" id="subtab-btn-tapestry" onclick="switchReflectSubTab('tapestry')">🎨 Colour Tapestry</button>
+        </div>
+      </div>
+
+      <!-- Subtab: Journal -->
+      <div id="subview-journal">
+        <div class="card mb-4">
+          <h2 style="font-size: 1.6rem; margin-bottom: 0.25rem;">Put words to the unsaid</h2>
+          <p style="font-size: 0.85rem; color: rgba(38,52,44,0.75); margin-bottom: 1.25rem;">
+            Write without editing yourself. Stored exclusively on your browser, never uploaded, and never public.
+          </p>
+
+          <form id="reflection-form" onsubmit="handleSaveReflection(event)">
+            <input type="hidden" id="ref-edit-id" value="">
+            <div style="margin-bottom: 1rem;">
+              <label style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; display: block; margin-bottom: 0.4rem;">How are you feeling right now?</label>
+              <div class="flex gap-2 flex-wrap" id="feeling-pills">
+                <!-- Feeling pills injected here -->
+              </div>
+              <input type="hidden" id="selected-feeling" value="">
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <input type="text" id="ref-title" placeholder="Give your thought a quiet title (e.g. Finding my breath)" required>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <textarea id="ref-content" rows="4" placeholder="What feels heavy? What felt good? What do you need to remind yourself of?..." required></textarea>
+            </div>
+
+            <div class="flex space-between align-center">
+              <span style="font-size: 0.75rem; color: rgba(38,52,44,0.6);">🔒 Visible only to you on this device</span>
+              <div class="flex gap-2">
+                <button type="button" class="btn btn-secondary hidden" id="ref-cancel-btn" onclick="cancelEditReflection()">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="ref-submit-btn">Save Reflection</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <h3 style="margin-bottom: 0.75rem;">Previous Reflections</h3>
+        <div id="reflections-list" class="grid-2"></div>
+      </div>
+
+      <!-- Subtab: Tapestry -->
+      <div id="subview-tapestry" class="hidden">
+        <div class="grid-2 mb-4" style="align-items: start;">
+          <!-- SVG Display -->
+          <div>
+            <div class="tapestry-art-wrap" id="tapestry-canvas-container">
+              <!-- Rendered SVG injected here -->
+            </div>
+            <div class="flex space-between" style="font-size: 0.75rem; color: rgba(38,52,44,0.6); padding: 0.5rem 0.25rem;">
+              <span>Live generative SVG canvas</span>
+              <span id="tapestry-seed-label">Seed #12</span>
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div class="card">
+            <div class="flex space-between align-center mb-4">
+              <h3>Palette & Fluidity Controls</h3>
+              <button class="btn btn-sage" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="shuffleTapestry()">🎲 Shuffle</button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+              <div>
+                <div class="flex space-between" style="font-size: 0.78rem; font-weight: 600; margin-bottom: 0.25rem;">
+                  <span>Pink Warmth & Tint</span>
+                  <span id="label-pink">45%</span>
+                </div>
+                <input type="range" id="slider-pink" min="0" max="100" value="45" oninput="updateTapestryLive()">
+              </div>
+
+              <div>
+                <div class="flex space-between" style="font-size: 0.78rem; font-weight: 600; margin-bottom: 0.25rem;">
+                  <span>Sage Depth & Contrast</span>
+                  <span id="label-sage">55%</span>
+                </div>
+                <input type="range" id="slider-sage" min="0" max="100" value="55" oninput="updateTapestryLive()">
+              </div>
+
+              <div>
+                <div class="flex space-between" style="font-size: 0.78rem; font-weight: 600; margin-bottom: 0.25rem;">
+                  <span>Wave Complexity</span>
+                  <span id="label-complexity">Level 4</span>
+                </div>
+                <input type="range" id="slider-complexity" min="1" max="8" value="4" oninput="updateTapestryLive()">
+              </div>
+
+              <div>
+                <div class="flex space-between" style="font-size: 0.78rem; font-weight: 600; margin-bottom: 0.25rem;">
+                  <span>Diffusion & Softness</span>
+                  <span id="label-softness">60%</span>
+                </div>
+                <input type="range" id="slider-softness" min="0" max="100" value="60" oninput="updateTapestryLive()">
+              </div>
+            </div>
+
+            <form onsubmit="handleSaveTapestry(event)" class="flex gap-2">
+              <input type="text" id="tapestry-title" placeholder="Name this artwork (e.g. Afternoon hush)" style="flex: 1;">
+              <button type="submit" class="btn btn-primary" style="white-space: nowrap;">Save Tapestry</button>
+            </form>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom: 0.75rem;">Saved Tapestries Gallery</h3>
+        <div id="saved-tapestries-list" class="grid-3"></div>
+      </div>
+    </div>
+
+    <!-- ================= COMMUNITY VIEW ================= -->
+    <div id="view-community" class="hidden">
+      <div class="flex space-between align-center mb-4 flex-wrap gap-2">
+        <div>
+          <h2 style="font-size: 1.8rem; margin-bottom: 0.2rem;">Lived experiences & resonance</h2>
+          <p style="font-size: 0.85rem; color: rgba(38,52,44,0.75);">Anonymized stories from peers. React gently to let them know they are heard.</p>
+        </div>
+        <span class="badge">Curated Demo Stories</span>
+      </div>
+
+      <!-- Topic Filters -->
+      <div class="flex gap-2 flex-wrap mb-4" id="community-topic-pills">
+        <!-- Topic buttons injected here -->
+      </div>
+
+      <!-- Stories Grid -->
+      <div class="grid-2" id="community-stories-grid"></div>
+    </div>
+
+    <!-- ================= SESSIONS VIEW ================= -->
+    <div id="view-sessions" class="hidden">
+      <div class="flex space-between align-center mb-4 flex-wrap gap-2">
+        <div>
+          <h2 style="font-size: 1.8rem; margin-bottom: 0.2rem;">Therapy Notes & Personal Milestones</h2>
+          <p style="font-size: 0.85rem; color: rgba(38,52,44,0.75);">Capture takeaways right after appointments so hard-earned insights are retained.</p>
+        </div>
+        <div class="flex align-center gap-2">
+          <div class="card" style="padding: 0.5rem 1rem; border-radius: 9999px;">
+            <strong id="session-count-main" style="font-size: 1.1rem; color: var(--forest);">1</strong>
+            <span style="font-size: 0.75rem;">Sessions Recorded</span>
+          </div>
+          <button class="btn btn-primary" onclick="openSessionForm()">+ Record Session</button>
+        </div>
+      </div>
+
+      <!-- Clinical Disclaimer -->
+      <div class="card mb-4" style="background: rgba(221,237,225,0.4); padding: 1rem 1.25rem;">
+        <p style="font-size: 0.78rem; color: rgba(38,52,44,0.85);">
+          🛡️ <strong>Private Personal Notes:</strong> These entries are for your own reflection. They are not a medical record, nor can your therapist or any third party access them.
+        </p>
+      </div>
+
+      <!-- Session Form Card (Collapsible) -->
+      <div class="card mb-4 hidden" id="session-form-card">
+        <h3 id="session-form-heading" style="margin-bottom: 1rem;">Record Therapy Session</h3>
+        <form onsubmit="handleSaveSession(event)">
+          <input type="hidden" id="sess-edit-id" value="">
+          <div class="grid-2 mb-4">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.25rem;">Session Date *</label>
+              <input type="date" id="sess-date" required>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.25rem;">Primary Focus / Theme *</label>
+              <input type="text" id="sess-focus" placeholder="e.g. Managing boundary fatigue with family" required>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.25rem;">Discussion Notes</label>
+            <textarea id="sess-notes" rows="3" placeholder="Key themes explored, somatic cues, memories brought up..."></textarea>
+          </div>
+
+          <div class="grid-2 mb-4">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.25rem;">Key Takeaway / Epiphany</label>
+              <textarea id="sess-takeaways" rows="2" placeholder="e.g. 'Perfectionism is an anxiety response, not a virtue.'"></textarea>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.25rem;">Gentle Next Step / Intention</label>
+              <textarea id="sess-steps" rows="2" placeholder="e.g. Practice intentional 80% completion on one non-critical task."></textarea>
+            </div>
+          </div>
+
+          <div class="flex space-between align-center">
+            <span style="font-size: 0.75rem; color: rgba(38,52,44,0.6);">Saves instantly to your local browser</span>
+            <div class="flex gap-2">
+              <button type="button" class="btn btn-secondary" onclick="closeSessionForm()">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save Session Note</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Chronological List -->
+      <h3 style="margin-bottom: 0.75rem;">Session Timeline</h3>
+      <div id="sessions-timeline" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+    </div>
+  </main>
+
+  <!-- Story Reading Modal -->
+  <div class="modal-backdrop" id="story-modal">
+    <div class="modal-content">
+      <button class="btn-icon" style="position: absolute; top: 1rem; right: 1rem;" onclick="closeStoryModal()">✕</button>
+      <div id="story-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Privacy Modal -->
+  <div class="modal-backdrop" id="privacy-modal">
+    <div class="modal-content">
+      <button class="btn-icon" style="position: absolute; top: 1rem; right: 1rem;" onclick="closePrivacyModal()">✕</button>
+      <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Privacy & Offline Storage</h3>
+      <p style="font-size: 0.85rem; color: rgba(38,52,44,0.8); margin-bottom: 1.25rem;">
+        Zero registration. Zero telemetry. Zero cloud storage.
+      </p>
+
+      <div style="background: rgba(221,237,225,0.5); padding: 1rem; border-radius: 1rem; margin-bottom: 1rem; font-size: 0.8rem;">
+        🔒 <strong>Local Storage:</strong> All reflections, tapestries, and session notes live exclusively in your local browser storage. They never leave your device.
+      </div>
+
+      <div style="background: var(--blush); padding: 1rem; border-radius: 1rem; margin-bottom: 1.5rem; font-size: 0.8rem;">
+        ⚠️ <strong>Prototype Notice:</strong> This presentation prototype does not encrypt data on your local hard drive.
+      </div>
+
+      <div class="flex gap-2">
+        <button class="btn btn-sage" onclick="resetDemoData()">Reset to Demo Data</button>
+        <button class="btn btn-secondary" style="color: #991b1b;" onclick="clearDemoData()">Clear All Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Alert -->
+  <div id="toast">Saved!</div>
+
+  <!-- Standalone Vanilla Application Script (Runs offline in all browsers without CORS or servers) -->
+  <script>
+    // --- Data Models & Seeds ---
+    const FEELINGS = ['Calm', 'Grateful', 'Hopeful', 'Reflective', 'Overwhelmed', 'Anxious', 'Weary', 'Seeking Clarity'];
+    
+    const INITIAL_STORIES = [
+      {
+        id: 'story-1',
+        title: 'The heavy weight of expectations before final exams',
+        topic: 'School pressure',
+        authorAlias: 'Silent Library Reader',
+        readingTime: '2 min read',
+        date: '2 days ago',
+        excerpt: 'Everyone assumed I had everything figured out because my grades were steady. Inside, my chest was tight every morning at 6 AM.',
+        fullStory: [
+          'Everyone around me assumed I had everything figured out because my grades were steady. Teachers praised my consistency, and my parents told relatives I was self-driven.',
+          'Inside, my chest was tight every morning at 6 AM. I wasn\'t studying out of curiosity or ambition anymore; I was studying out of sheer dread that one lower mark would shatter the identity everyone built for me.',
+          'One Tuesday in the library, staring at a page of practice equations, I started trembling and couldn\'t focus my eyes. A stranger at the next desk quietly slid over a peppermint candy and a small sticky note that said: "Take a sip of water. It\'s okay to pause."',
+          'It didn\'t erase the exam, but it punctured the panic. It reminded me that I am a human being existing in a room, not a grading algorithm.'
+        ],
+        reactions: { hearYou: 24, relate: 31, holdingSpace: 12 }
+      },
+      {
+        id: 'story-2',
+        title: 'Cooking dinner in an apartment that felt too quiet',
+        topic: 'Loneliness',
+        authorAlias: 'Corner Window Resident',
+        readingTime: '3 min read',
+        date: '3 days ago',
+        excerpt: 'Moving across the country sounded brave until the first Friday night when no one called and the radiator was the only sound.',
+        fullStory: [
+          'Moving across the country for a new job sounded courageous in conversations. I packed my belongings with a sense of adventure.',
+          'Then the first Friday night arrived. The unpacking boxes were flat, the work emails ceased, and the kitchen was deafeningly silent. I chopped carrots for a pasta sauce and realized I hadn\'t spoken out loud in fourteen hours.',
+          'Loneliness isn\'t just feeling sad; it feels like physical coldness in your palms. You wonder if anyone would notice if you dissolved.',
+          'I forced myself to leave the stove on simmer, open the apartment window, and listen to the street sounds below — dogs barking, bicycles rattling over pavers. I wasn\'t connected yet, but I was part of the living world. Step by step, that was enough for tonight.'
+        ],
+        reactions: { hearYou: 42, relate: 28, holdingSpace: 19 }
+      },
+      {
+        id: 'story-3',
+        title: 'Saying no to Sunday family dinner without an apology',
+        topic: 'Family difficulties',
+        authorAlias: 'Learning Boundarism',
+        readingTime: '3 min read',
+        date: '5 days ago',
+        excerpt: 'For thirty years, saying "no" to my mother felt like committing a felony. Last weekend, I finally set my first quiet boundary.',
+        fullStory: [
+          'In my family, boundaries were treated as insults. If you had plans of your own, you were selfish; if you needed solitude, you were distant.',
+          'Every Sunday dinner turned into an unspoken trial where my life choices, body weight, and career pace were picked apart under the guise of "caring". By Sunday night, I was depleted for the week ahead.',
+          'Last Sunday, I sent a simple text: "I won\'t be attending tonight, but I hope you all have a lovely evening. Love to all." When the guilt-tripping follow-up calls started, I left my phone in the drawer and took a walk under the trees.',
+          'My hands shook for an hour. But when Monday came, I woke up with my energy intact for the first time in years. Guilt was the tax I had to pay for my own peace, and it was worth it.'
+        ],
+        reactions: { hearYou: 53, relate: 47, holdingSpace: 26 }
+      },
+      {
+        id: 'story-4',
+        title: 'Forgiving the version of myself that didn\'t know better',
+        topic: 'Personal growth',
+        authorAlias: 'Reflective Nomad',
+        readingTime: '2 min read',
+        date: '1 week ago',
+        excerpt: 'I used to replay mistakes from five years ago at 2 AM with blistering self-criticism. Here is what changed.',
+        fullStory: [
+          'I used to replay arguments, botched projects, and lost friendships at 2 AM with blistering self-criticism. I judged my past actions with the wisdom I only gained because of those failures.',
+          'My counselor suggested a visual exercise: picture that younger self sitting on a bench in the park, stressed and lacking tools. Would you walk up to them and scream? Or would you sit down and put a blanket over their shoulders?',
+          'Realizing that self-criticism is not accountability was my turning point. Compassion allows you to change; shame just keeps you paralyzed in the shame loop.',
+          'Today I can look back at old journals and feel tenderness rather than humiliation. Growth is slow, but gentleness speeds it up.'
+        ],
+        reactions: { hearYou: 38, relate: 35, holdingSpace: 21 }
+      },
+      {
+        id: 'story-5',
+        title: 'Leaving my laptop in the office overnight',
+        topic: 'Career burnout',
+        authorAlias: 'Recovering Overachiever',
+        readingTime: '2 min read',
+        date: '1 week ago',
+        excerpt: 'I measured my self-worth by my response time on Slack. When my body gave out, I had to rethink everything.',
+        fullStory: [
+          'I was the person who responded to team pings in three minutes, even at 10 PM. I wore my exhaustion like a medal.',
+          'Then migraines started hitting every Thursday afternoon. My doctor asked: "What are you running from?" I answered: "If I slow down, I might find out I\'m replaceable."',
+          'Last week, I physically closed my laptop at 5:30 PM, placed it in my desk locker, and walked out without my charger or bag. The commute home felt strangely spacious. The sky was pink and violet.',
+          'Nothing burned down. The emails waited until 9 AM the next morning. My emergency was entirely artificial.'
+        ],
+        reactions: { hearYou: 61, relate: 52, holdingSpace: 17 }
+      },
+      {
+        id: 'story-6',
+        title: 'Finding sanctuary in an early morning tea ritual',
+        topic: 'Quiet healing',
+        authorAlias: 'Morning Light',
+        readingTime: '2 min read',
+        date: '2 weeks ago',
+        excerpt: 'When therapy felt exhausting and grief was loud, five minutes of watching steam rise from hot water kept me grounded.',
+        fullStory: [
+          'Grief isn\'t always tears; sometimes it\'s pure numbness and feeling untethered from reality.',
+          'After difficult grief counseling sessions, my therapist advised against rushing back into productivity. She suggested finding one sensory anchor.',
+          'Mine became loose-leaf peppermint tea. No phone, no news, no book. Just the sound of water boiling, the pale green colour unfurling in the porcelain cup, and the warm ceramic against my palms.',
+          'Five quiet minutes did what hours of overthinking could not: it reminded my nervous system that right here, right now, I am safe and breathing.'
+        ],
+        reactions: { hearYou: 49, relate: 29, holdingSpace: 33 }
+      }
+    ];
+
+    const INITIAL_REFLECTIONS = [
+      {
+        id: 'ref-1',
+        title: 'Noticing the breath when the day starts moving too fast',
+        content: 'Felt my shoulders creeping up towards my ears during the morning team sync. Stepped outside for 3 minutes to feel the cool wind. Reminded myself that I don\'t need to answer every problem in the same breath it is delivered.',
+        feeling: 'Reflective',
+        createdAt: new Date(Date.now() - 86400000).toISOString()
+      },
+      {
+        id: 'ref-2',
+        title: 'Gratitude for the stillness between tasks',
+        content: 'Finished a demanding milestone. Rather than instantly loading up another to-do list, I sat on the rug with a glass of water and let the accomplishment settle in.',
+        feeling: 'Grateful',
+        createdAt: new Date(Date.now() - 86400000 * 3).toISOString()
+      }
+    ];
+
+    const INITIAL_SESSIONS = [
+      {
+        id: 'sess-1',
+        date: new Date(Date.now() - 86400000 * 7).toISOString().slice(0, 10),
+        focusArea: 'Navigating perfectionism and inner critic triggers',
+        notes: 'Discussed how early expectations formed an automatic "must perform" instinct. Looked at somatic cues (tight jaw, shallow breathing) that warn me when perfectionism takes over from healthy diligence.',
+        takeaways: 'The goal is good enough with peace, not flawless with misery. Perfectionism is an anxiety response, not a virtue.',
+        nextSteps: 'Practice intentional 80% completion on one non-critical task this week without reviewing it twice.'
+      }
+    ];
+
+    const INITIAL_TAPESTRIES = [
+      {
+        id: 'tap-1',
+        title: 'Morning Forest Hush',
+        config: { pink: 35, sage: 65, complexity: 4, softness: 70, seed: 42 },
+        createdAt: new Date(Date.now() - 86400000 * 2).toISOString()
+      }
+    ];
+
+    // --- State Storage ---
+    function loadStorage(key, fallback) {
+      try {
+        const val = localStorage.getItem('stillroom_' + key);
+        return val ? JSON.parse(val) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+    function saveStorage(key, val) {
+      try {
+        localStorage.setItem('stillroom_' + key, JSON.stringify(val));
+      } catch (e) { console.error(e); }
+    }
+
+    let state = {
+      reflections: loadStorage('reflections', INITIAL_REFLECTIONS),
+      sessions: loadStorage('sessions', INITIAL_SESSIONS),
+      tapestries: loadStorage('tapestries', INITIAL_TAPESTRIES),
+      userReactions: loadStorage('reactions', {}),
+      currentTapestry: { pink: 45, sage: 55, complexity: 4, softness: 60, seed: 12 },
+      selectedTopic: 'All'
+    };
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 2200);
+    }
+
+    // --- Tab Switching ---
+    function switchTab(tabId, subtab) {
+      ['dashboard', 'reflect', 'community', 'sessions'].forEach(t => {
+        document.getElementById('view-' + t).classList.add('hidden');
+        document.getElementById('tab-btn-' + t).classList.remove('active');
+      });
+      document.getElementById('view-' + tabId).classList.remove('hidden');
+      document.getElementById('tab-btn-' + tabId).classList.add('active');
+
+      if (tabId === 'reflect' && subtab) {
+        switchReflectSubTab(subtab);
+      }
+      renderDashboard();
+    }
+
+    function switchReflectSubTab(sub) {
+      document.getElementById('subview-journal').classList.toggle('hidden', sub !== 'journal');
+      document.getElementById('subview-tapestry').classList.toggle('hidden', sub !== 'tapestry');
+      document.getElementById('subtab-btn-journal').classList.toggle('active', sub === 'journal');
+      document.getElementById('subtab-btn-tapestry').classList.toggle('active', sub === 'tapestry');
+      if (sub === 'tapestry') renderTapestryCanvas();
+    }
+
+    // --- SVG Generator ---
+    function renderTapestrySVG(config) {
+      const { pink, sage, complexity, softness, seed } = config;
+      const pinkFactor = pink / 100;
+      const sageFactor = sage / 100;
+
+      const pR = Math.round(249 - pinkFactor * 25);
+      const pG = Math.round(231 - pinkFactor * 65);
+      const pB = Math.round(235 - pinkFactor * 45);
+
+      const sR = Math.round(221 - sageFactor * (221 - 41));
+      const sG = Math.round(237 - sageFactor * (237 - 71));
+      const sB = Math.round(225 - sageFactor * (225 - 55));
+
+      const blur = Math.round((softness / 100) * 20);
+
+      // Waves
+      function wave(idx) {
+        let pts = [];
+        const count = complexity + 3;
+        for (let i = 0; i < count; i++) {
+          const x = (i / (count - 1)) * 800;
+          const pseudo = Math.sin((i + 1) * (idx + 2) * 1.7 + seed * 0.3) * 0.5 + 0.5;
+          const y = 160 + idx * 80 + (pseudo - 0.5) * (50 + complexity * 12);
+          pts.push({ x, y });
+        }
+        let d = `M 0,${pts[0].y}`;
+        for (let i = 0; i < pts.length - 1; i++) {
+          const cpX = (pts[i].x + pts[i+1].x) / 2;
+          d += ` Q ${pts[i].x + (cpX - pts[i].x) * 0.8},${pts[i].y} ${cpX},${(pts[i].y + pts[i+1].y) / 2} T ${pts[i+1].x},${pts[i+1].y}`;
+        }
+        return d + ` L 800,600 L 0,600 Z`;
+      }
+
+      return `
+        <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g-bg-${seed}" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#FFF9F7"/>
+              <stop offset="100%" stop-color="#DDEDE1"/>
+            </linearGradient>
+            <linearGradient id="g-p-${seed}" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="rgb(${pR},${pG},${pB})" stop-opacity="0.85"/>
+              <stop offset="100%" stop-color="rgba(${pR+10},${pG+15},${pB+10},0.5)"/>
+            </linearGradient>
+            <linearGradient id="g-s-${seed}" x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0%" stop-color="rgb(${sR},${sG},${sB})" stop-opacity="0.9"/>
+              <stop offset="100%" stop-color="rgba(${sR+30},${sG+30},${sB+30},0.5)"/>
+            </linearGradient>
+            <filter id="f-${seed}">
+              <feGaussianBlur stdDeviation="${blur}"/>
+            </filter>
+          </defs>
+          <rect width="800" height="600" fill="url(#g-bg-${seed})"/>
+          <g filter="url(#f-${seed})">
+            <circle cx="${200 + (seed * 47)%350}" cy="${150 + (seed * 31)%250}" r="${140 + pinkFactor * 60}" fill="rgb(${pR},${pG},${pB})" opacity="0.65"/>
+            <circle cx="${500 + (seed * 67)%250}" cy="${280 + (seed * 23)%220}" r="${160 + sageFactor * 70}" fill="rgb(${sR},${sG},${sB})" opacity="0.55"/>
+          </g>
+          <path d="${wave(0)}" fill="url(#g-s-${seed})"/>
+          <path d="${wave(1)}" fill="url(#g-p-${seed})"/>
+          <path d="${wave(2)}" fill="#294737" opacity="${sageFactor * 0.4}"/>
+        </svg>
+      `;
+    }
+
+    function renderTapestryCanvas() {
+      const container = document.getElementById('tapestry-canvas-container');
+      container.innerHTML = renderTapestrySVG(state.currentTapestry);
+      document.getElementById('tapestry-seed-label').textContent = 'Seed #' + state.currentTapestry.seed;
+    }
+
+    function updateTapestryLive() {
+      state.currentTapestry.pink = Number(document.getElementById('slider-pink').value);
+      state.currentTapestry.sage = Number(document.getElementById('slider-sage').value);
+      state.currentTapestry.complexity = Number(document.getElementById('slider-complexity').value);
+      state.currentTapestry.softness = Number(document.getElementById('slider-softness').value);
+
+      document.getElementById('label-pink').textContent = state.currentTapestry.pink + '%';
+      document.getElementById('label-sage').textContent = state.currentTapestry.sage + '%';
+      document.getElementById('label-complexity').textContent = 'Level ' + state.currentTapestry.complexity;
+      document.getElementById('label-softness').textContent = state.currentTapestry.softness + '%';
+
+      renderTapestryCanvas();
+    }
+
+    function shuffleTapestry() {
+      state.currentTapestry.seed = Math.floor(Math.random() * 1000) + 1;
+      renderTapestryCanvas();
+    }
+
+    function handleSaveTapestry(e) {
+      e.preventDefault();
+      const titleInput = document.getElementById('tapestry-title');
+      const title = titleInput.value.trim() || `Tapestry #${state.tapestries.length + 1}`;
+      state.tapestries.unshift({
+        id: 'tap-' + Date.now(),
+        title,
+        config: { ...state.currentTapestry },
+        createdAt: new Date().toISOString()
+      });
+      saveStorage('tapestries', state.tapestries);
+      titleInput.value = '';
+      renderTapestriesList();
+      renderDashboard();
+      showToast('Colour tapestry saved to gallery!');
+    }
+
+    function renderTapestriesList() {
+      const el = document.getElementById('saved-tapestries-list');
+      if (state.tapestries.length === 0) {
+        el.innerHTML = '<p style="font-size:0.8rem; color:gray;">No saved tapestries yet.</p>';
+        return;
+      }
+      el.innerHTML = state.tapestries.map(t => `
+        <div class="card" style="padding: 0.85rem;">
+          <div class="tapestry-art-wrap" style="margin-bottom: 0.5rem;">
+            ${renderTapestrySVG(t.config)}
+          </div>
+          <h4 style="font-size: 0.95rem; margin-bottom: 0.2rem;">${escapeHTML(t.title)}</h4>
+          <div class="flex space-between align-center" style="margin-top: 0.5rem;">
+            <button class="btn btn-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick="loadTapestry('${t.id}')">Inspect</button>
+            <button class="btn-icon btn-danger" onclick="deleteTapestry('${t.id}')">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function loadTapestry(id) {
+      const found = state.tapestries.find(t => t.id === id);
+      if (found) {
+        state.currentTapestry = { ...found.config };
+        document.getElementById('slider-pink').value = found.config.pink;
+        document.getElementById('slider-sage').value = found.config.sage;
+        document.getElementById('slider-complexity').value = found.config.complexity;
+        document.getElementById('slider-softness').value = found.config.softness;
+        updateTapestryLive();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function deleteTapestry(id) {
+      state.tapestries = state.tapestries.filter(t => t.id !== id);
+      saveStorage('tapestries', state.tapestries);
+      renderTapestriesList();
+      renderDashboard();
+      showToast('Tapestry removed.');
+    }
+
+    // --- Reflections ---
+    function renderFeelingPills() {
+      const container = document.getElementById('feeling-pills');
+      container.innerHTML = FEELINGS.map(f => `
+        <button type="button" class="btn btn-secondary feeling-btn" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;" onclick="selectFeeling('${f}', this)">
+          ${f}
+        </button>
+      `).join('');
+    }
+
+    function selectFeeling(f, btn) {
+      const input = document.getElementById('selected-feeling');
+      const allBtns = document.querySelectorAll('.feeling-btn');
+      if (input.value === f) {
+        input.value = '';
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-secondary');
+      } else {
+        input.value = f;
+        allBtns.forEach(b => { b.classList.remove('btn-primary'); b.classList.add('btn-secondary'); });
+        btn.classList.remove('btn-secondary');
+        btn.classList.add('btn-primary');
+      }
+    }
+
+    function handleSaveReflection(e) {
+      e.preventDefault();
+      const editId = document.getElementById('ref-edit-id').value;
+      const title = document.getElementById('ref-title').value.trim();
+      const content = document.getElementById('ref-content').value.trim();
+      const feeling = document.getElementById('selected-feeling').value;
+
+      if (editId) {
+        state.reflections = state.reflections.map(r => r.id === editId ? { ...r, title, content, feeling } : r);
+        showToast('Reflection updated.');
+      } else {
+        state.reflections.unshift({
+          id: 'ref-' + Date.now(),
+          title: title || 'Untitled Reflection',
+          content,
+          feeling,
+          createdAt: new Date().toISOString()
+        });
+        showToast('Reflection saved privately.');
+      }
+
+      saveStorage('reflections', state.reflections);
+      cancelEditReflection();
+      renderReflectionsList();
+      renderDashboard();
+    }
+
+    function startEditReflection(id) {
+      const ref = state.reflections.find(r => r.id === id);
+      if (!ref) return;
+      document.getElementById('ref-edit-id').value = ref.id;
+      document.getElementById('ref-title').value = ref.title;
+      document.getElementById('ref-content').value = ref.content;
+      document.getElementById('selected-feeling').value = ref.feeling || '';
+      document.getElementById('ref-submit-btn').textContent = 'Update Reflection';
+      document.getElementById('ref-cancel-btn').classList.remove('hidden');
+
+      document.querySelectorAll('.feeling-btn').forEach(b => {
+        if (b.textContent.trim() === ref.feeling) {
+          b.classList.remove('btn-secondary'); b.classList.add('btn-primary');
+        } else {
+          b.classList.remove('btn-primary'); b.classList.add('btn-secondary');
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelEditReflection() {
+      document.getElementById('ref-edit-id').value = '';
+      document.getElementById('ref-title').value = '';
+      document.getElementById('ref-content').value = '';
+      document.getElementById('selected-feeling').value = '';
+      document.getElementById('ref-submit-btn').textContent = 'Save Reflection';
+      document.getElementById('ref-cancel-btn').classList.add('hidden');
+      document.querySelectorAll('.feeling-btn').forEach(b => {
+        b.classList.remove('btn-primary'); b.classList.add('btn-secondary');
+      });
+    }
+
+    function deleteReflection(id) {
+      state.reflections = state.reflections.filter(r => r.id !== id);
+      saveStorage('reflections', state.reflections);
+      renderReflectionsList();
+      renderDashboard();
+      showToast('Reflection removed.');
+    }
+
+    function renderReflectionsList() {
+      const el = document.getElementById('reflections-list');
+      if (state.reflections.length === 0) {
+        el.innerHTML = '<p style="font-size:0.85rem; color:gray;">No reflections saved yet.</p>';
+        return;
+      }
+      el.innerHTML = state.reflections.map(r => `
+        <div class="card">
+          <div class="flex space-between align-center mb-4">
+            <span class="badge ${r.feeling ? 'badge-blush' : ''}">${r.feeling || 'Reflection'}</span>
+            <div class="flex gap-2">
+              <button class="btn-icon" onclick="startEditReflection('${r.id}')">✏️</button>
+              <button class="btn-icon btn-danger" onclick="deleteReflection('${r.id}')">🗑️</button>
+            </div>
+          </div>
+          <h4 style="font-size: 1.15rem; margin-bottom: 0.4rem;">${escapeHTML(r.title)}</h4>
+          <p style="font-size: 0.85rem; color: rgba(38,52,44,0.85); line-height: 1.6; white-space: pre-wrap;">${escapeHTML(r.content)}</p>
+        </div>
+      `).join('');
+    }
+
+    // --- Community Stories ---
+    const TOPICS = ['All', 'School pressure', 'Loneliness', 'Family difficulties', 'Personal growth', 'Career burnout', 'Quiet healing'];
+
+    function renderCommunityTopics() {
+      const el = document.getElementById('community-topic-pills');
+      el.innerHTML = TOPICS.map(topic => `
+        <button class="btn ${state.selectedTopic === topic ? 'btn-primary' : 'btn-secondary'}" style="padding: 0.25rem 0.85rem; font-size: 0.75rem;" onclick="filterCommunity('${topic}')">
+          ${topic}
+        </button>
+      `).join('');
+    }
+
+    function filterCommunity(topic) {
+      state.selectedTopic = topic;
+      renderCommunityTopics();
+      renderCommunityStories();
+    }
+
+    function toggleCommunityReaction(storyId, rx) {
+      if (!state.userReactions[storyId]) state.userReactions[storyId] = {};
+      state.userReactions[storyId][rx] = !state.userReactions[storyId][rx];
+      saveStorage('reactions', state.userReactions);
+      renderCommunityStories();
+      renderDashboard();
+    }
+
+    function renderCommunityStories() {
+      const el = document.getElementById('community-stories-grid');
+      const filtered = state.selectedTopic === 'All' ? INITIAL_STORIES : INITIAL_STORIES.filter(s => s.topic === state.selectedTopic);
+
+      el.innerHTML = filtered.map(story => {
+        const uRx = state.userReactions[story.id] || {};
+        const countHear = story.reactions.hearYou + (uRx.hearYou ? 1 : 0);
+        const countRelate = story.reactions.relate + (uRx.relate ? 1 : 0);
+        const countSpace = story.reactions.holdingSpace + (uRx.holdingSpace ? 1 : 0);
+
+        return `
+          <div class="card">
+            <div class="flex space-between align-center mb-4">
+              <span class="badge">${story.topic}</span>
+              <span style="font-size: 0.75rem; color: rgba(38,52,44,0.6);">${story.readingTime} · ${story.date}</span>
+            </div>
+            <h4 style="font-size: 1.15rem; margin-bottom: 0.4rem;">${story.title}</h4>
+            <p style="font-size: 0.85rem; color: rgba(38,52,44,0.8); margin-bottom: 0.75rem;">"${story.excerpt}"</p>
+            <p style="font-size: 0.75rem; color: rgba(38,52,44,0.6); font-style: italic; margin-bottom: 1rem;">Shared by ${story.authorAlias}</p>
+
+            <div class="flex space-between align-center" style="border-top: 1px solid var(--pale-sage); padding-top: 0.75rem;">
+              <button class="btn btn-secondary" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;" onclick="openStoryModal('${story.id}')">Read Full</button>
+              <div class="flex gap-2">
+                <button class="btn ${uRx.hearYou ? 'btn-primary' : 'btn-secondary'}" style="padding: 0.2rem 0.5rem; font-size: 0.72rem;" onclick="toggleCommunityReaction('${story.id}', 'hearYou')">
+                  🕊️ I hear you (${countHear})
+                </button>
+                <button class="btn ${uRx.relate ? 'btn-primary' : 'btn-secondary'}" style="padding: 0.2rem 0.5rem; font-size: 0.72rem;" onclick="toggleCommunityReaction('${story.id}', 'relate')">
+                  🤍 Relate (${countRelate})
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openStoryModal(id) {
+      const story = INITIAL_STORIES.find(s => s.id === id);
+      if (!story) return;
+      const uRx = state.userReactions[story.id] || {};
+      const countHear = story.reactions.hearYou + (uRx.hearYou ? 1 : 0);
+      const countRelate = story.reactions.relate + (uRx.relate ? 1 : 0);
+
+      document.getElementById('story-modal-body').innerHTML = `
+        <span class="badge" style="margin-bottom: 0.5rem;">${story.topic}</span>
+        <h3 style="font-size: 1.6rem; margin-bottom: 0.25rem; line-height: 1.2;">${story.title}</h3>
+        <p style="font-size: 0.78rem; color: rgba(38,52,44,0.6); margin-bottom: 1.25rem;">Reflected by ${story.authorAlias} · ${story.date}</p>
+        <div style="font-size: 0.95rem; line-height: 1.7; color: rgba(38,52,44,0.9); margin-bottom: 1.5rem;">
+          ${story.fullStory.map(p => `<p style="margin-bottom: 1rem;">${p}</p>`).join('')}
+        </div>
+        <div class="flex gap-2" style="border-top: 1px solid var(--pale-sage); padding-top: 1rem;">
+          <button class="btn ${uRx.hearYou ? 'btn-primary' : 'btn-secondary'}" onclick="toggleCommunityReaction('${story.id}', 'hearYou'); openStoryModal('${story.id}')">
+            🕊️ I hear you (${countHear})
+          </button>
+          <button class="btn ${uRx.relate ? 'btn-primary' : 'btn-secondary'}" onclick="toggleCommunityReaction('${story.id}', 'relate'); openStoryModal('${story.id}')">
+            🤍 I relate (${countRelate})
+          </button>
+        </div>
+      `;
+      document.getElementById('story-modal').style.display = 'flex';
+    }
+
+    function closeStoryModal() {
+      document.getElementById('story-modal').style.display = 'none';
+    }
+
+    // --- Sessions ---
+    function openSessionForm() {
+      document.getElementById('sess-edit-id').value = '';
+      document.getElementById('sess-date').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('sess-focus').value = '';
+      document.getElementById('sess-notes').value = '';
+      document.getElementById('sess-takeaways').value = '';
+      document.getElementById('sess-steps').value = '';
+      document.getElementById('session-form-heading').textContent = 'Record Therapy Session';
+      document.getElementById('session-form-card').classList.remove('hidden');
+    }
+
+    function closeSessionForm() {
+      document.getElementById('session-form-card').classList.add('hidden');
+    }
+
+    function handleSaveSession(e) {
+      e.preventDefault();
+      const editId = document.getElementById('sess-edit-id').value;
+      const date = document.getElementById('sess-date').value;
+      const focusArea = document.getElementById('sess-focus').value.trim();
+      const notes = document.getElementById('sess-notes').value.trim();
+      const takeaways = document.getElementById('sess-takeaways').value.trim();
+      const nextSteps = document.getElementById('sess-steps').value.trim();
+
+      if (editId) {
+        state.sessions = state.sessions.map(s => s.id === editId ? { ...s, date, focusArea, notes, takeaways, nextSteps } : s);
+        showToast('Session updated.');
+      } else {
+        state.sessions.unshift({
+          id: 'sess-' + Date.now(),
+          date,
+          focusArea,
+          notes,
+          takeaways,
+          nextSteps
+        });
+        showToast('Session recorded.');
+      }
+
+      saveStorage('sessions', state.sessions);
+      closeSessionForm();
+      renderSessionsTimeline();
+      renderDashboard();
+    }
+
+    function startEditSession(id) {
+      const sess = state.sessions.find(s => s.id === id);
+      if (!sess) return;
+      document.getElementById('sess-edit-id').value = sess.id;
+      document.getElementById('sess-date').value = sess.date;
+      document.getElementById('sess-focus').value = sess.focusArea;
+      document.getElementById('sess-notes').value = sess.notes || '';
+      document.getElementById('sess-takeaways').value = sess.takeaways || '';
+      document.getElementById('sess-steps').value = sess.nextSteps || '';
+      document.getElementById('session-form-heading').textContent = 'Edit Session Note';
+      document.getElementById('session-form-card').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteSession(id) {
+      state.sessions = state.sessions.filter(s => s.id !== id);
+      saveStorage('sessions', state.sessions);
+      renderSessionsTimeline();
+      renderDashboard();
+      showToast('Session removed.');
+    }
+
+    function exportSession(id, format) {
+      const sess = state.sessions.find(s => s.id === id);
+      if (!sess) return;
+
+      let content = '';
+      if (format === 'markdown') {
+        content = `# Therapy Session Notes\\nDate: ${sess.date}\\nFocus: ${sess.focusArea}\\n\\n## Discussion Notes\\n${sess.notes || 'None'}\\n\\n## Key Takeaways\\n${sess.takeaways || 'None'}\\n\\n## Next Steps\\n${sess.nextSteps || 'None'}\\n\\n---\\nStillroom Private Personal Record`;
+      } else {
+        content = `STILLROOM THERAPY SESSION NOTES\\nDate: ${sess.date}\\nFocus: ${sess.focusArea}\\n\\n1. DISCUSSION NOTES:\\n${sess.notes || 'None'}\\n\\n2. KEY TAKEAWAYS:\\n${sess.takeaways || 'None'}\\n\\n3. NEXT STEPS:\\n${sess.nextSteps || 'None'}`;
+      }
+
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `stillroom-session-${sess.date}.${format === 'markdown' ? 'md' : 'txt'}`;
+      a.click();
+      showToast(`Exported .${format === 'markdown' ? 'md' : 'txt'} file!`);
+    }
+
+    function renderSessionsTimeline() {
+      const el = document.getElementById('sessions-timeline');
+      document.getElementById('session-count-main').textContent = state.sessions.length;
+
+      if (state.sessions.length === 0) {
+        el.innerHTML = '<p style="font-size:0.85rem; color:gray;">No therapy sessions recorded yet.</p>';
+        return;
+      }
+
+      el.innerHTML = state.sessions.map(s => `
+        <div class="card">
+          <div class="flex space-between align-center mb-4">
+            <span class="badge">🗓️ ${s.date}</span>
+            <div class="flex gap-2">
+              <button class="btn btn-sage" style="padding: 0.2rem 0.55rem; font-size: 0.72rem;" onclick="exportSession('${s.id}', 'markdown')">Export .md</button>
+              <button class="btn btn-secondary" style="padding: 0.2rem 0.55rem; font-size: 0.72rem;" onclick="exportSession('${s.id}', 'text')">.txt</button>
+              <button class="btn-icon" onclick="startEditSession('${s.id}')">✏️</button>
+              <button class="btn-icon btn-danger" onclick="deleteSession('${s.id}')">🗑️</button>
+            </div>
+          </div>
+          <h4 style="font-size: 1.25rem; margin-bottom: 0.5rem;">${escapeHTML(s.focusArea)}</h4>
+          ${s.notes ? `<p style="font-size: 0.85rem; color: rgba(38,52,44,0.85); margin-bottom: 0.75rem; white-space: pre-wrap;">${escapeHTML(s.notes)}</p>` : ''}
+          <div class="grid-2" style="margin-top: 0.75rem;">
+            ${s.takeaways ? `<div style="background: rgba(221,237,225,0.4); padding: 0.85rem; border-radius: 0.85rem; font-size: 0.82rem;"><strong>🌱 Takeaway:</strong> "${escapeHTML(s.takeaways)}"</div>` : ''}
+            ${s.nextSteps ? `<div style="background: rgba(249,231,235,0.5); padding: 0.85rem; border-radius: 0.85rem; font-size: 0.82rem;"><strong>🎯 Next Step:</strong> ${escapeHTML(s.nextSteps)}</div>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- Dashboard Renderer ---
+    function renderDashboard() {
+      document.getElementById('nav-session-count').textContent = state.sessions.length;
+      document.getElementById('hero-session-count').textContent = state.sessions.length;
+      document.getElementById('dash-sess-count').textContent = state.sessions.length;
+      document.getElementById('dash-ref-count').textContent = state.reflections.length;
+      document.getElementById('dash-tap-count').textContent = state.tapestries.length;
+
+      // Recent reflections
+      const refEl = document.getElementById('dash-recent-reflections');
+      if (state.reflections.length === 0) {
+        refEl.innerHTML = '<p style="font-size:0.8rem; color:gray;">No reflections yet.</p>';
+      } else {
+        refEl.innerHTML = state.reflections.slice(0, 2).map(r => `
+          <div style="background: rgba(221,237,225,0.3); padding: 0.85rem; border-radius: 1rem; cursor: pointer;" onclick="switchTab('reflect')">
+            <div class="flex space-between align-center">
+              <strong>${escapeHTML(r.title)}</strong>
+              ${r.feeling ? `<span class="badge badge-blush">${r.feeling}</span>` : ''}
+            </div>
+            <p style="font-size: 0.78rem; color: rgba(38,52,44,0.7); margin-top: 0.25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHTML(r.content)}</p>
+          </div>
+        `).join('');
+      }
+
+      // Featured story
+      const featStory = INITIAL_STORIES[0];
+      const uRx = state.userReactions[featStory.id] || {};
+      const countHear = featStory.reactions.hearYou + (uRx.hearYou ? 1 : 0);
+      const countRelate = featStory.reactions.relate + (uRx.relate ? 1 : 0);
+
+      document.getElementById('dash-featured-story').innerHTML = `
+        <span class="badge" style="margin-bottom: 0.4rem;">${featStory.topic}</span>
+        <h4 style="font-size: 1.1rem; margin-bottom: 0.35rem;">${featStory.title}</h4>
+        <p style="font-size: 0.8rem; color: rgba(38,52,44,0.75); margin-bottom: 0.75rem;">"${featStory.excerpt}"</p>
+        <div class="flex gap-2">
+          <button class="btn ${uRx.hearYou ? 'btn-primary' : 'btn-secondary'}" style="padding: 0.2rem 0.5rem; font-size: 0.72rem;" onclick="toggleCommunityReaction('${featStory.id}', 'hearYou')">
+            🕊️ I hear you (${countHear})
+          </button>
+          <button class="btn ${uRx.relate ? 'btn-primary' : 'btn-secondary'}" style="padding: 0.2rem 0.5rem; font-size: 0.72rem;" onclick="toggleCommunityReaction('${featStory.id}', 'relate')">
+            🤍 I relate (${countRelate})
+          </button>
+        </div>
+      `;
+    }
+
+    // --- Privacy Modal & Utilities ---
+    function openPrivacyModal() { document.getElementById('privacy-modal').style.display = 'flex'; }
+    function closePrivacyModal() { document.getElementById('privacy-modal').style.display = 'none'; }
+
+    function resetDemoData() {
+      state.reflections = [...INITIAL_REFLECTIONS];
+      state.sessions = [...INITIAL_SESSIONS];
+      state.tapestries = [...INITIAL_TAPESTRIES];
+      state.userReactions = {};
+      saveStorage('reflections', state.reflections);
+      saveStorage('sessions', state.sessions);
+      saveStorage('tapestries', state.tapestries);
+      saveStorage('reactions', state.userReactions);
+      closePrivacyModal();
+      initApp();
+      showToast('Sample data restored.');
+    }
+
+    function clearDemoData() {
+      state.reflections = [];
+      state.sessions = [];
+      state.tapestries = [];
+      state.userReactions = {};
+      saveStorage('reflections', []);
+      saveStorage('sessions', []);
+      saveStorage('tapestries', []);
+      saveStorage('reactions', {});
+      closePrivacyModal();
+      initApp();
+      showToast('All local data cleared.');
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[tag] || tag));
+    }
+
+    // --- Init ---
+    function initApp() {
+      renderFeelingPills();
+      renderReflectionsList();
+      renderCommunityTopics();
+      renderCommunityStories();
+      renderSessionsTimeline();
+      renderTapestriesList();
+      renderTapestryCanvas();
+      renderDashboard();
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
